@@ -1,0 +1,30 @@
+import express from 'express';
+import cors from 'cors';
+import 'express-async-errors';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import tweetsRouter from './router/tweets.js';
+
+const app = express();
+
+app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
+app.use(morgan('tiny'));
+app.use(helmet());
+
+app.use('/tweets', tweetsRouter);
+
+app.use((req, res, next) => {
+  res.sendStatus(404);
+});
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  res.status(500).send('Something went wrong!');
+});
+
+app.listen(8080, () => {
+  console.log('listening on 8080!');
+});
