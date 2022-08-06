@@ -1,16 +1,16 @@
 import * as tweetRepository from '../data/tweets.js';
 
-export function getTweets(req, res, next) {
+export async function getTweets(req, res, next) {
   const { username } = req.query;
-  const data = username
+  const data = await (username
     ? tweetRepository.getByUsername(username)
-    : tweetRepository.getAll();
+    : tweetRepository.getAll());
   res.status(200).json(data);
 }
 
-export function getTweetById(req, res, next) {
+export async function getTweetById(req, res, next) {
   const { id } = req.params;
-  const tweet = tweetRepository.getById(id);
+  const tweet = await tweetRepository.getById(id);
   if (tweet.length < 1) {
     return res.status(404).json({ message: `Tweet id(${id}) not found` });
   } else {
@@ -18,16 +18,16 @@ export function getTweetById(req, res, next) {
   }
 }
 
-export function createTweet(req, res, next) {
+export async function createTweet(req, res, next) {
   const { text, username, name } = req.body;
-  const newTweet = tweetRepository.create(text, name, username);
+  const newTweet = await tweetRepository.create(text, name, username);
   res.status(201).json(newTweet);
 }
 
-export function updateTweet(req, res, next) {
+export async function updateTweet(req, res, next) {
   const { id } = req.params;
   const { text } = req.body;
-  const tweet = tweetRepository.update(id, text);
+  const tweet = await tweetRepository.update(id, text);
 
   if (tweet) {
     tweet.text = text;
@@ -37,15 +37,15 @@ export function updateTweet(req, res, next) {
   }
 }
 
-export function deleteTweet(req, res, next) {
+export async function deleteTweet(req, res, next) {
   const { id } = req.params;
 
-  const tweet = tweetRepository.getById(id);
+  const tweet = await tweetRepository.getById(id);
 
   if (tweet.length < 1) {
     return res.status(404).json({ message: `Tweet id(${id}) not found` });
   } else {
-    tweetRepository.remove(id);
+    await tweetRepository.remove(id);
     res.sendStatus(204);
   }
 }
