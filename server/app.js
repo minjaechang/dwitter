@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import tweetsRouter from './router/tweets.js';
+import authRouter from './router/auth.js';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(morgan('tiny'));
 app.use(helmet());
 
 app.use('/tweets', tweetsRouter);
+app.use('/auth', authRouter);
 
 app.use((req, res, next) => {
   res.sendStatus(404);
