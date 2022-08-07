@@ -29,6 +29,10 @@ const validateSignup = [
     .isEmail()
     .normalizeEmail()
     .withMessage('Please enter valid email'),
+  body('url')
+    .isURL()
+    .withMessage('invalid URL')
+    .optional({ nullable: true, checkFalsy: true }),
   validate,
 ];
 
