@@ -26,3 +26,7 @@ export async function createUser(user) {
   users.push(newUser);
   return newUser.id;
 }
+
+export async function findById(id) {
+  return users.find((user) => user.id === id);
+}

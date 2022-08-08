@@ -54,3 +54,11 @@ function createJwtToken(id) {
     expiresIn: jwtExpiresInSec,
   });
 }
+
+export async function me(req, res, next) {
+  const user = await userRepository.findById(req.userId);
+  if (!user) {
+    return res.status(400).json({ message: 'User not found' });
+  }
+  res.status(200).json({ username: user.username, token: req.token });
+}
