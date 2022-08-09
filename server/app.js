@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import tweetsRouter from './router/tweets.js';
 import authRouter from './router/auth.js';
 import { config } from './config.js';
+import { initSocket } from './connection/socket.js';
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use((error, req, res, next) => {
   res.status(500).send('Something went wrong!');
 });
 
-app.listen(config.host.port, () => {
-  console.log('Server is running');
+const server = app.listen(config.host.port, () => {
+  console.log('server is running');
 });
+initSocket(server);

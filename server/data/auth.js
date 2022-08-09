@@ -8,6 +8,13 @@ let users = [
     name: 'Bob',
     email: 'bob@gmail.com',
   },
+  {
+    id: '2',
+    username: 'ellie',
+    password: '$2b$10$3Fk1NEZ/7a9Ha3CkxHXhe.3Ay35UGub7iX17uYK.3eGjqvfU.Z9GS',
+    name: 'Ellie',
+    email: 'ellie@gmail.com',
+  },
 ];
 
 export async function findByUsername(username) {
