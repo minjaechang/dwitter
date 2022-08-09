@@ -1,23 +1,16 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { config } from '../config.js';
 import * as userRepository from '../data/auth.js';
-import dotenv from 'dotenv';
-dotenv.config();
-
-// TODO: Make it secure!
-const bcryptSalt = parseInt(process.env.BCRYPT_SALT);
-const jwtSecretKey = process.env.JWT_SECRET_KEY;
-const jwtExpiresInSec = parseInt(process.env.JWT_EXPIRES_SEC);
 
 export async function signup(req, res, next) {
   const { username, password, name, email } = req.body;
-
   const found = await userRepository.findByUsername(username);
   if (found) {
     return res.status(409).json({ message: `${username} already exists` });
   }
 
-  const hashed = await bcrypt.hash(password, bcryptSalt);
+  const hashed = await bcrypt.hash(password, config.bcrypt.saltRounds);
   const newUser = {
     username,
     password: hashed,
@@ -50,8 +43,8 @@ export async function login(req, res, next) {
 }
 
 function createJwtToken(id) {
-  return jwt.sign({ id }, jwtSecretKey, {
-    expiresIn: jwtExpiresInSec,
+  return jwt.sign({ id }, config.jwt.secretKey, {
+    expiresIn: config.jwt.expiresInSec,
   });
 }
 
