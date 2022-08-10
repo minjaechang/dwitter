@@ -1,65 +1,43 @@
-import * as userRepository from '../data/auth.js';
+import { db } from '../db/database.js';
 
-let tweets = [
-  {
-    id: '1',
-    text: 'my first tweet',
-    createdAt: new Date(),
-    userId: '1',
-  },
-  {
-    id: '2',
-    text: 'test!',
-    createdAt: new Date(),
-    userId: '1',
-  },
-];
+const SELECT_JOIN = `SELECT t.id, t.text, t.createdAt, t.userId, u.username, u.name, u.url
+FROM tweets AS t
+JOIN users As u
+ON t.userId = u.id`;
+const ORDER_DESC = `ORDER BY t.createdAt DESC`;
 
 export async function getAll() {
-  // return array of promise
-  return Promise.all(
-    tweets.map(async (tweet) => {
-      const { username, name } = await userRepository.findById(tweet.userId);
-      return { ...tweet, username, name };
-    })
-  );
+  return db.execute(`${SELECT_JOIN} ${ORDER_DESC}`).then((result) => result[0]);
 }
 
 export async function getByUsername(username) {
-  return getAll().then((tweets) =>
-    tweets.filter((tweet) => tweet.username === username)
-  );
+  return db
+    .execute(`${SELECT_JOIN} WHERE u.username=? ${ORDER_DESC}`, [username])
+    .then((result) => result[0]);
 }
 
 export async function getById(id) {
-  const found = tweets.find((tweet) => tweet.id === id);
-  if (!found) {
-    return null;
-  }
-  const { username, name } = await userRepository.findById(found.userId);
-  return { ...found, username, name };
+  return db
+    .execute(`${SELECT_JOIN} WHERE t.id=?`, [id])
+    .then((result) => result[0][0]);
 }
 
 export async function create(text, userId) {
-  const tweet = {
-    id: Date.now().toString(),
-    text,
-    createdAt: new Date(),
-    userId,
-  };
-  tweets = [tweet, ...tweets];
-  return getById(tweet.id);
+  return db
+    .execute(
+      `INSERT INTO tweets (text, createdAt, userId)
+      VALUES (?,?,?)`,
+      [text, new Date(), userId]
+    )
+    .then((result) => getById(result[0].insertId));
 }
 
 export async function update(id, text) {
-  // "find" method returns "undefined" when there is no matched data
-  const tweet = tweets.find((tweet) => tweet.id === id);
-  if (tweet) {
-    tweet.text = text;
-  }
-  return getById(tweet.id);
+  return db
+    .execute('UPDATE tweets SET text=? WHERE id=?', [text, id])
+    .then((result) => getById(id));
 }
 
 export async function remove(id) {
-  tweets = tweets.filter((tweet) => tweet.id !== id);
+  return db.execute('DELETE FROM tweets WHERE id=?', [id]);
 }
