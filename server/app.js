@@ -7,7 +7,6 @@ import tweetsRouter from './router/tweets.js';
 import authRouter from './router/auth.js';
 import { config } from './config.js';
 import { initSocket } from './connection/socket.js';
-// import { db } from './db/database.js';
 import { sequelize } from './db/database.js';
 
 const app = express();
