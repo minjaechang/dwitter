@@ -29,7 +29,7 @@ app.use((error, req, res, next) => {
 });
 
 // sync creates the table if it doesn't exist
-sequelize.sync().then((client) => {
+sequelize.sync().then(() => {
   // console.log(client);
 
   // will be executed after the database is connected!
@@ -38,13 +38,3 @@ sequelize.sync().then((client) => {
   });
   initSocket(server);
 });
-
-// Testing the connection
-// sequelize
-//   .authenticate()
-//   .then(() => {
-//     console.log('Connection has been established successfully.');
-//   })
-//   .catch((error) => {
-//     console.error('Unable to connect to the database:', error);
-//   });
