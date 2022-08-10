@@ -33,7 +33,7 @@ sequelize.sync().then(() => {
   console.log('database is connected!');
   // will be executed after the database is connected!
   const server = app.listen(config.host.port, () => {
-    console.log('server is running');
+    console.log('server is running!');
   });
   initSocket(server);
 });
