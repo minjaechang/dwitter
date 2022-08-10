@@ -30,8 +30,7 @@ app.use((error, req, res, next) => {
 
 // sync creates the table if it doesn't exist
 sequelize.sync().then(() => {
-  // console.log(client);
-
+  console.log('database is connected!');
   // will be executed after the database is connected!
   const server = app.listen(config.host.port, () => {
     console.log('server is running');
