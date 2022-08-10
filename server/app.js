@@ -7,7 +7,8 @@ import tweetsRouter from './router/tweets.js';
 import authRouter from './router/auth.js';
 import { config } from './config.js';
 import { initSocket } from './connection/socket.js';
-import { db } from './db/database.js';
+// import { db } from './db/database.js';
+import { sequelize } from './db/database.js';
 
 const app = express();
 
@@ -28,11 +29,23 @@ app.use((error, req, res, next) => {
   res.status(500).send('Something went wrong!');
 });
 
-db.getConnection().then(() => {
-  console.log('database connected');
+// sync creates the table if it doesn't exist
+sequelize.sync().then((client) => {
+  // console.log(client);
+
+  // will be executed after the database is connected!
+  const server = app.listen(config.host.port, () => {
+    console.log('server is running');
+  });
+  initSocket(server);
 });
 
-const server = app.listen(config.host.port, () => {
-  console.log('server is running');
-});
-initSocket(server);
+// Testing the connection
+// sequelize
+//   .authenticate()
+//   .then(() => {
+//     console.log('Connection has been established successfully.');
+//   })
+//   .catch((error) => {
+//     console.error('Unable to connect to the database:', error);
+//   });

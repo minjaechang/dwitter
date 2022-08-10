@@ -1,4 +1,4 @@
-import { db } from '../db/database.js';
+// import { db } from '../db/database.js';
 
 const SELECT_JOIN = `SELECT t.id, t.text, t.createdAt, t.userId, u.username, u.name, u.url
 FROM tweets AS t
