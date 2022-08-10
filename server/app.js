@@ -28,9 +28,10 @@ app.use((error, req, res, next) => {
   res.status(500).send('Something went wrong!');
 });
 
-db.getConnection().then((connection) => {
-  console.log(connection);
+db.getConnection().then(() => {
+  console.log('database connected');
 });
+
 const server = app.listen(config.host.port, () => {
   console.log('server is running');
 });

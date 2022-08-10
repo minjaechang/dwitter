@@ -4,7 +4,7 @@ import { config } from '../config.js';
 import * as userRepository from '../data/auth.js';
 
 export async function signup(req, res, next) {
-  const { username, password, name, email } = req.body;
+  const { username, password, name, email, url } = req.body;
   const found = await userRepository.findByUsername(username);
   if (found) {
     return res.status(409).json({ message: `${username} already exists` });
@@ -16,6 +16,7 @@ export async function signup(req, res, next) {
     password: hashed,
     name,
     email,
+    url,
   };
   const userId = await userRepository.createUser(newUser);
 
