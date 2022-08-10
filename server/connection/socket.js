@@ -14,7 +14,8 @@ class Socket {
 
     this.#io.use((socket, next) => {
       // https://socket.io/docs/v4/server-socket-instance/#sockethandshake
-      const token = socket.handshake.auth.token;
+      const token = socket.handshake.auth.token; // 꼭 auth를 사용하자!
+      // const token = socket.handshake.query && socket.handshake.query.token; // query 통해 전달❌
       if (!token) {
         return next(new Error('Authentication error'));
       }
