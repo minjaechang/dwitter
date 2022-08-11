@@ -1,65 +1,75 @@
+import MongoDb from 'mongodb';
 import * as userRepository from '../data/auth.js';
+import { getTweets } from '../db/database.js';
+const ObjectId = MongoDb.ObjectId;
 
-let tweets = [
-  {
-    id: '1',
-    text: 'my first tweet',
-    createdAt: new Date(),
-    userId: '1',
-  },
-  {
-    id: '2',
-    text: 'test!',
-    createdAt: new Date(),
-    userId: '1',
-  },
-];
+// NoSQL (정보의 중복 > 관계)
+// 모든 사용자가 트윗을 쿼리하는 횟수 > 사용자가 사용자의 정보를 업데이트하는 횟수
+// 프로필 DB
+// 사용자 문서 DB: 서버1, 서버2, 서버3
+// 각각의 데이터베이스가 고립, 서로 관계❌
+// join query - performance not good 👎
+
+// SQL: relational
+// join query - good performance 👍
 
 export async function getAll() {
-  // return array of promise
-  return Promise.all(
-    tweets.map(async (tweet) => {
-      const { username, name } = await userRepository.findById(tweet.userId);
-      return { ...tweet, username, name };
-    })
-  );
+  return getTweets() //
+    .find()
+    .sort({ createdAt: -1 })
+    .toArray()
+    .then(mapTweets);
 }
 
 export async function getByUsername(username) {
-  return getAll().then((tweets) =>
-    tweets.filter((tweet) => tweet.username === username)
-  );
+  return getTweets() //
+    .find({ username })
+    .sort({ createdAt: -1 })
+    .toArray()
+    .then(mapTweets);
 }
 
 export async function getById(id) {
-  const found = tweets.find((tweet) => tweet.id === id);
-  if (!found) {
-    return null;
-  }
-  const { username, name } = await userRepository.findById(found.userId);
-  return { ...found, username, name };
+  return getTweets() //
+    .findOne({ _id: new ObjectId(id) })
+    .then(mapOptionalTweet);
 }
 
 export async function create(text, userId) {
+  const { name, username, url } = await userRepository.findById(userId);
   const tweet = {
-    id: Date.now().toString(),
     text,
     createdAt: new Date(),
     userId,
+    name,
+    username,
+    url,
   };
-  tweets = [tweet, ...tweets];
-  return getById(tweet.id);
+  return getTweets()
+    .insertOne(tweet)
+    .then((data) => mapOptionalTweet({ ...tweet, _id: data.insertedId }));
 }
 
 export async function update(id, text) {
-  // "find" method returns "undefined" when there is no matched data
-  const tweet = tweets.find((tweet) => tweet.id === id);
-  if (tweet) {
-    tweet.text = text;
-  }
-  return getById(tweet.id);
+  return getTweets() //
+    .findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { text } },
+      { returnDocument: 'after' } // 업데이트 된 후의 상태 리턴
+    )
+    .then((data) => data.value)
+    .then(mapOptionalTweet);
 }
 
 export async function remove(id) {
-  tweets = tweets.filter((tweet) => tweet.id !== id);
+  return getTweets() //
+    .deleteOne({ _id: new ObjectId(id) });
+}
+
+function mapOptionalTweet(tweet) {
+  return tweet ? { ...tweet, id: tweet._id.toString() } : tweet;
+}
+
+function mapTweets(tweets) {
+  return tweets.map(mapOptionalTweet);
 }

@@ -30,7 +30,7 @@ app.use((error, req, res, next) => {
 
 connectDB()
   .then((db) => {
-    console.log('database is connected!', db);
+    console.log('database is connected!');
     const server = app.listen(config.host.port, () => {
       console.log('server is running');
     });
