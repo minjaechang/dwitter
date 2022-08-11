@@ -11,8 +11,13 @@ import { sequelize } from './db/database.js';
 
 const app = express();
 
+const corsOption = {
+  origin: config.cors.allowedOrigin,
+  optionsSuccessStatus: 200,
+};
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOption));
 app.use(morgan('tiny'));
 app.use(helmet());
 
@@ -32,8 +37,8 @@ app.use((error, req, res, next) => {
 sequelize.sync().then(() => {
   console.log('database is connected!');
   // will be executed after the database is connected!
-  const server = app.listen(config.host.port, () => {
-    console.log('server is running!');
+  const server = app.listen(config.port, () => {
+    console.log(`server is started... ${new Date()}`);
   });
   initSocket(server);
 });
