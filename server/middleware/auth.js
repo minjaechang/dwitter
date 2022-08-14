@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 import * as userRepository from '../data/auth.js';
-import dotenv from 'dotenv';
 import { config } from '../config.js';
-dotenv.config();
 
 const AUTH_ERROR = { message: 'Authentication Error' };
 
@@ -10,7 +8,7 @@ export const isAuth = async (req, res, next) => {
   const authHeader = req.get('Authorization');
 
   if (!(authHeader && authHeader.startsWith('Bearer'))) {
-    return res.status(404).json(AUTH_ERROR);
+    return res.status(401).json(AUTH_ERROR);
   }
 
   const token = authHeader.split(' ')[1];
